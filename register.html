@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Greatest 64 Registration</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #000000, #1a1a1a);
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4">
+  <div class="w-full max-w-xl bg-gray-900 p-8 rounded-2xl shadow-2xl border border-red-500">
+    <h1 class="text-4xl font-bold text-center text-red-400 mb-6">Konami eFootball | Greatest 64 League</h1>
+    <p class="text-center text-yellow-300 mb-4">Register now for the ultimate showdown! Unique numbers for each participant! Free Entry!</p>
+
+    <form id="regForm" class="space-y-4">
+      <div>
+        <label class="block mb-1 text-sm">EFootball Username</label>
+        <input id="username" class="w-full p-2 rounded bg-gray-800 text-white" placeholder="e.g., Trumperbee" required />
+      </div>
+      <div>
+        <label class="block mb-1 text-sm">Select Your Team</label>
+        <input id="team" class="w-full p-2 rounded bg-gray-800 text-white" placeholder="e.g., Barcelona" required />
+      </div>
+      <div>
+        <label class="block mb-1 text-sm">Phone Number</label>
+        <input id="phone" type="tel" class="w-full p-2 rounded bg-gray-800 text-white" placeholder="e.g., +254712345678" required />
+      </div>
+      <button type="submit" class="w-full py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded">Submit</button>
+    </form>
+
+    <p class="text-sm mt-6 text-center text-gray-400">Powered by Victor (Trumperbee) | Sponsored by Konami ✅</p>
+  </div>
+
+  <script>
+    emailjs.init("UjNA4LVXkiKT0Kqf7");
+
+    const usedUsernames = new Set();
+    const usedTeams = new Set();
+    const usedNumbers = new Set();
+
+    function getUniqueRandomNumber() {
+      if (usedNumbers.size >= 64) return null;
+      let number;
+      do {
+        number = Math.floor(Math.random() * 64) + 1;
+      } while (usedNumbers.has(number));
+      usedNumbers.add(number);
+      return number;
+    }
+
+    document.getElementById("regForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const team = document.getElementById("team").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (usedUsernames.has(username)) {
+        alert("⚠️ This username has already been used. Please choose a different one.");
+        return;
+      }
+
+      if (usedTeams.has(team)) {
+        alert("⚠️ This team has already been selected. Please choose another.");
+        return;
+      }
+
+      const randomNumber = getUniqueRandomNumber();
+      if (!randomNumber) {
+        alert("❌ Registration full! All 64 slots are taken.");
+        return;
+      }
+
+      // Store used data
+      usedUsernames.add(username);
+      usedTeams.add(team);
+
+      // Prepare EmailJS payload
+      const templateParams = {
+        username: username,
+        team: team,
+        phone: phone,
+        number: randomNumber
+      };
+
+      emailjs.send("service_zepfx2q", "template_nhf88ss", templateParams)
+        .then(function(response) {
+          alert(`✅ Success! You’ve been assigned number ${randomNumber}. This number is unique to you. Welcome to the Greatest 64 League!`);
+        }, function(error) {
+          alert("❌ Something went wrong. Please try again later.");
+          console.log(error);
+        });
+
+      // Clear form
+      document.getElementById("regForm").reset();
+    });
+  </script>
+</body>
+</html>
